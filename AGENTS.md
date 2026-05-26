@@ -29,6 +29,7 @@ Current UI state:
 - Draws are random and may repeat.
 - Draw history is stored in `localStorage` under `faithbook.drawHistory.v1`.
 - Non-Mission revealed cards stay minimal: a 3:4 white card with only the centered question/body, a small card number in the top-right, and a floating close button outside the card.
+- Life Event cards show A/B/C choice buttons below the card; choosing an option saves that choice into normal history and closes the card.
 - Mission revealed cards use generated artwork from `public/mission-images/mission-XX.png`, show mission details from markdown, and include `完成` / `失败` buttons below the card.
 - Failed Mission cards are stored separately in `localStorage` under `faithbook.failedMissions.v1` and shown as a bottom-right retry stack.
 
@@ -37,4 +38,4 @@ Implementation notes:
 - Main interactive UI: `src/components/faithbook-draw-app.tsx`
 - Markdown parsing and deck normalization: `src/lib/decks.ts`
 - Falling background component: `src/components/ui/falling-pattern.tsx`
-- Preserve the minimal revealed-card face for non-Mission decks unless the user explicitly asks to bring metadata/details back.
+- Preserve the minimal revealed-card face for Real Talk, Casual Chat, and the Life Event scenario area unless the user explicitly asks to bring metadata/details back.
