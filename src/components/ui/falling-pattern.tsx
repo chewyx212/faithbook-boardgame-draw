@@ -21,7 +21,7 @@ export function FallingPattern({
   className,
 }: FallingPatternProps) {
   const colors = Array.isArray(color) ? color : [color];
-  const colorAt = (index: number) => colors[(index * 7 + 3) % colors.length];
+  const colorAt = (index: number) => colors[index % colors.length];
 
   const generateBackgroundImage = () => {
     const patterns = [

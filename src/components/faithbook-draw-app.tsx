@@ -356,15 +356,15 @@ export function FaithbookDrawApp({ decks }: { decks: Deck[] }) {
     <main className="relative min-h-svh overflow-hidden bg-white text-stone-950">
       <div className="absolute inset-0">
         <FallingPattern
-          className="h-full [mask-image:radial-gradient(ellipse_at_center,transparent,var(--background))]"
-          color={["#ef4444", "#2563eb", "#f59e0b", "#16a34a", "#8b5cf6", "#06b6d4"]}
+          className="h-full [mask-image:radial-gradient(ellipse_at_center,black_0%,black_74%,transparent_100%)]"
+          color={["#ff2f73", "#2563ff", "#ffb000", "#00a86b", "#9b5cff", "#00b8d9", "#ff6a3d"]}
           backgroundColor="#ffffff"
-          duration={74}
-          blurIntensity="0.14rem"
-          density={1.45}
+          duration={62}
+          blurIntensity="0.04rem"
+          density={1.08}
         />
       </div>
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.22)_58%,rgba(255,255,255,0.7))]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,0.08)_58%,rgba(255,255,255,0.28))]" />
 
       <button
         type="button"
