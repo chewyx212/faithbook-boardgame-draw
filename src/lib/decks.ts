@@ -133,7 +133,6 @@ function parseChoices(source: string): Choice[] {
 function getField(block: string, label: string): string {
   const pattern = new RegExp(
     `\\*\\*${escapeRegExp(label)}\\s*[:：]\\*\\*\\s*\\n([\\s\\S]*?)(?=\\n\\*\\*[^\\n]+?[:：]\\*\\*|\\n---|$)`,
-    "m",
   );
   const match = block.match(pattern);
 

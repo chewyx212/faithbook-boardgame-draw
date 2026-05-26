@@ -505,7 +505,14 @@ function DrawDialog({
           >
             <X className="size-5" aria-hidden="true" />
           </button>
-          <div className="relative z-10 flex w-[min(78vw,390px)] flex-col items-center gap-4 [perspective:1400px] sm:w-[min(58vw,420px)]">
+          <div
+            className={cn(
+              "relative z-10 flex flex-col items-center [perspective:1400px]",
+              activeDraw.card.kind === "life-event"
+                ? "w-[min(78vw,330px)] gap-3 sm:w-[min(48vw,350px)]"
+                : "w-[min(78vw,390px)] gap-4 sm:w-[min(58vw,420px)]",
+            )}
+          >
             <motion.div
               key={activeDraw.entryId}
               className="relative aspect-[3/4] w-full"
@@ -544,9 +551,9 @@ function DrawDialog({
                     key={choice.label}
                     type="button"
                     onClick={() => onLifeEventChoice(choice)}
-                    className="grid grid-cols-[2.4rem_1fr] items-center gap-2 rounded-2xl border border-sky-200 bg-white/94 px-4 py-3 text-left text-sky-950 shadow-lg shadow-stone-950/10 transition hover:bg-sky-50 focus:outline-none focus:ring-2 focus:ring-sky-300"
+                    className="grid grid-cols-[2.25rem_1fr] items-center gap-2 rounded-2xl border border-sky-200 bg-white/94 px-3 py-2 text-left text-sky-950 shadow-lg shadow-stone-950/10 transition hover:bg-sky-50 focus:outline-none focus:ring-2 focus:ring-sky-300"
                   >
-                    <span className="grid size-9 place-items-center rounded-full bg-sky-500 text-sm font-black text-white">
+                    <span className="grid size-8 place-items-center rounded-full bg-sky-500 text-sm font-black text-white">
                       {choice.label}
                     </span>
                     <span className="text-sm font-black leading-5">{choice.text}</span>
