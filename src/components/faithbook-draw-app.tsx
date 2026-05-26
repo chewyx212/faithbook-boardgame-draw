@@ -16,12 +16,13 @@ import {
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { FallingPattern } from "@/components/ui/falling-pattern";
 import { cn } from "@/lib/utils";
-import type { Deck, DeckId, DeckTone, FaithbookCard } from "@/lib/types";
+import type { Choice, Deck, DeckId, DeckTone, FaithbookCard } from "@/lib/types";
 
 type HistoryEntry = {
   entryId: string;
   cardId: string;
   drawnAt: string;
+  choice?: Choice;
   missionResult?: MissionResult;
 };
 
@@ -247,7 +248,7 @@ export function FaithbookDrawApp({ decks }: { decks: Deck[] }) {
       drawnAt,
     };
 
-    if (card.kind !== "mission") {
+    if (card.kind === "question") {
       setHistory((current) => [entry, ...current].slice(0, MAX_HISTORY));
     }
 
@@ -330,6 +331,27 @@ export function FaithbookDrawApp({ decks }: { decks: Deck[] }) {
     setActiveDraw(null);
   };
 
+  const chooseLifeEvent = (choice: Choice) => {
+    if (!activeDraw || activeDraw.card.kind !== "life-event") {
+      return;
+    }
+
+    const entry: HistoryEntry = {
+      entryId: activeDraw.source === "history" ? activeDraw.entryId : createEntryId(),
+      cardId: activeDraw.card.id,
+      drawnAt: activeDraw.drawnAt,
+      choice,
+    };
+
+    if (activeDraw.source === "history") {
+      setHistory((current) => current.map((item) => (item.entryId === activeDraw.entryId ? { ...item, choice } : item)));
+    } else {
+      setHistory((current) => [entry, ...current].slice(0, MAX_HISTORY));
+    }
+
+    setActiveDraw(null);
+  };
+
   return (
     <main className="relative min-h-svh overflow-hidden bg-white text-stone-950">
       <div className="absolute inset-0">
@@ -390,6 +412,7 @@ export function FaithbookDrawApp({ decks }: { decks: Deck[] }) {
       <DrawDialog
         activeDraw={activeDraw}
         onClose={() => setActiveDraw(null)}
+        onLifeEventChoice={chooseLifeEvent}
         onMissionComplete={completeMission}
         onMissionFail={failMission}
         reducedMotion={Boolean(shouldReduceMotion)}
@@ -442,16 +465,20 @@ function DeckButton({
 function DrawDialog({
   activeDraw,
   onClose,
+  onLifeEventChoice,
   onMissionComplete,
   onMissionFail,
   reducedMotion,
 }: {
   activeDraw: ActiveDraw | null;
   onClose: () => void;
+  onLifeEventChoice: (choice: Choice) => void;
   onMissionComplete: () => void;
   onMissionFail: () => void;
   reducedMotion: boolean;
 }) {
+  const choices = activeDraw?.card.kind === "life-event" ? activeDraw.card.choices ?? [] : [];
+
   return (
     <AnimatePresence>
       {activeDraw ? (
@@ -508,6 +535,23 @@ function DrawDialog({
                   <Check className="size-5" aria-hidden="true" />
                   完成
                 </button>
+              </div>
+            ) : null}
+            {activeDraw.card.kind === "life-event" && choices.length > 0 ? (
+              <div className="grid w-full gap-2">
+                {choices.map((choice) => (
+                  <button
+                    key={choice.label}
+                    type="button"
+                    onClick={() => onLifeEventChoice(choice)}
+                    className="grid grid-cols-[2.4rem_1fr] items-center gap-2 rounded-2xl border border-sky-200 bg-white/94 px-4 py-3 text-left text-sky-950 shadow-lg shadow-stone-950/10 transition hover:bg-sky-50 focus:outline-none focus:ring-2 focus:ring-sky-300"
+                  >
+                    <span className="grid size-9 place-items-center rounded-full bg-sky-500 text-sm font-black text-white">
+                      {choice.label}
+                    </span>
+                    <span className="text-sm font-black leading-5">{choice.text}</span>
+                  </button>
+                ))}
               </div>
             ) : null}
           </div>
@@ -845,6 +889,11 @@ function HistoryDrawer({
                                   完成
                                 </span>
                               ) : null}
+                              {entry.card.kind === "life-event" && entry.choice ? (
+                                <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-black text-sky-700">
+                                  选择 {entry.choice.label}
+                                </span>
+                              ) : null}
                               <span className="text-xs font-bold text-stone-400">{String(entry.card.number).padStart(2, "0")}</span>
                             </span>
                           </span>
@@ -852,6 +901,11 @@ function HistoryDrawer({
                             {getDeckTitle(entry.card.deckId)} · {formatDate(entry.drawnAt)}
                           </span>
                           <span className="mt-2 line-clamp-2 block text-sm leading-6 text-stone-600">{entry.card.body}</span>
+                          {entry.card.kind === "life-event" && entry.choice ? (
+                            <span className="mt-2 line-clamp-1 block text-sm font-bold leading-5 text-sky-700">
+                              选择 {entry.choice.label} · {entry.choice.text}
+                            </span>
+                          ) : null}
                         </span>
                       </button>
                     );
@@ -920,12 +974,26 @@ function isHistoryEntry(value: unknown): value is HistoryEntry {
 
   const candidate = value as Partial<HistoryEntry>;
   const missionResult = candidate.missionResult;
+  const choice = candidate.choice;
 
   return (
     typeof candidate.entryId === "string" &&
     typeof candidate.cardId === "string" &&
     typeof candidate.drawnAt === "string" &&
+    (choice === undefined || isChoice(choice)) &&
     (missionResult === undefined || missionResult === "completed" || missionResult === "failed")
+  );
+}
+
+function isChoice(value: unknown): value is Choice {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as Partial<Choice>;
+  return (
+    (candidate.label === "A" || candidate.label === "B" || candidate.label === "C") &&
+    typeof candidate.text === "string"
   );
 }
 
